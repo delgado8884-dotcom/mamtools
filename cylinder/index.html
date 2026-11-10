@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>실린더 간편 선정기 | MAM TOOLS</title>
+<meta name="description" content="하중·압력·설치 방향만 넣으면 공압 실린더 필요 추력과 추천 표준 내경(Ø6~Ø100)을 바로 계산하는 무료 웹 계산기. 설치·회원가입 없음.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="실린더 간편 선정기 | MAM TOOLS">
+<meta property="og:description" content="하중·압력만 넣으면 공압 실린더 추천 내경(Ø6~Ø100)이 바로. 무료 · 설치 없음 · PC/모바일">
+<meta property="og:image" content="https://delgado8884-dotcom.github.io/mamtools/cylinder/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://delgado8884-dotcom.github.io/mamtools/cylinder/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon"href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M8 30 Q50 4 92 30 Q50 14 8 30 Z' fill='%23E3262F'/%3E%3Cpolygon points='22,92 22,36 29,36 50,62 71,36 78,36 78,92 71,92 71,49 50,75 29,49 29,92' fill='%230B0B0C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0B0C; --bg:#FFFFFF; --red:#E3262F;
+  --g1:#C4C6CA; --g2:#8A8D93; --g3:#5E6166;
+  --line:#E3E4E6; --soft:#F4F5F6;
+  --en:'Michroma','Noto Sans KR',sans-serif;
+  --kr:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--kr);font-size:15px;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+
+/* 상단 */
+.top{border-bottom:1px solid var(--ink)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.brand{display:flex;align-items:flex-end;gap:10px;text-decoration:none;color:inherit}
+.brand svg{height:20px;width:auto;display:block}
+.brand span{font-family:var(--en);font-size:9px;letter-spacing:.5em;color:var(--g3);line-height:1;margin-bottom:1px}
+.product{font-family:var(--en);font-size:10px;letter-spacing:.24em;color:var(--g3);text-transform:uppercase}
+
+/* 제목 */
+.head{padding:44px 0 28px}
+h1{margin:0;font-size:30px;font-weight:700;letter-spacing:-.01em}
+.head p{margin:6px 0 0;color:var(--g3)}
+
+/* 치수선 모양 구역 제목 */
+.dimhead{display:flex;align-items:center;gap:12px;margin:0 0 20px}
+.dimhead b{font-family:var(--en);font-weight:400;font-size:10px;letter-spacing:.3em;color:var(--g3)}
+.dimhead i{flex:1;height:9px;border-left:1px solid var(--g2);border-right:1px solid var(--g2);position:relative}
+.dimhead i::after{content:"";position:absolute;left:0;right:0;top:4px;border-top:1px solid var(--g1)}
+
+.grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;padding-bottom:40px}
+
+/* 입력 */
+.field{margin-bottom:20px}
+.field label,.field .lbl{display:block;font-weight:500;font-size:14px;margin-bottom:6px}
+.box{display:flex;align-items:center;border:1px solid var(--g1);border-radius:4px;background:#fff;transition:border-color .15s}
+.box:focus-within{border-color:var(--ink)}
+.box input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:17px;padding:11px 12px;color:var(--ink)}
+.box .unit{padding:0 14px 0 4px;color:var(--g3);font-size:14px;white-space:nowrap}
+.field.bad .box{border-color:var(--red)}
+.msg{min-height:0;font-size:13px;color:var(--red);margin-top:5px}
+.msg:empty{display:none}
+.hint{font-size:13px;color:var(--g3);margin-top:5px}
+details.help{font-size:13px;color:var(--g3);margin-top:4px}
+details.help summary{cursor:pointer;width:max-content;max-width:100%;text-decoration:underline;text-underline-offset:3px}
+details.help p{margin:6px 0 0}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--g1);border-radius:4px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;margin:0;font-weight:500;font-size:14px;cursor:pointer;color:var(--g3);transition:background .15s,color .15s}
+.seg label+input+label{border-left:1px solid var(--g1)}
+.seg input:checked+label{background:var(--ink);color:#fff}
+.seg input:focus-visible+label{outline:2px solid var(--ink);outline-offset:-4px}
+.seg svg{width:18px;height:18px}
+
+.actions{display:flex;gap:10px;margin-top:28px}
+button{font:inherit;font-weight:500;font-size:15px;min-height:48px;padding:0 22px;border-radius:4px;cursor:pointer;letter-spacing:.02em}
+.btn-primary{flex:1;background:var(--ink);color:#fff;border:1px solid var(--ink)}
+.btn-primary:hover{background:#2a2b2e}
+.btn-line{flex:1;background:#fff;color:var(--ink);border:1px solid var(--ink)}
+.btn-line:hover{background:var(--soft)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* 결과 */
+.result{scroll-margin-top:16px}
+.answer{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.answer .k{font-size:14px;font-weight:500;color:var(--g3)}
+.bore{font-family:var(--en);font-size:68px;line-height:1.05;letter-spacing:.02em;margin-top:6px;white-space:nowrap}
+.bore.warn{color:var(--red);font-family:var(--kr);font-weight:700;font-size:40px;letter-spacing:0}
+.dreq{font-size:14px;color:var(--g3);margin-top:6px}
+.state{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;border:1px solid var(--ink);white-space:nowrap}
+.state.ok{background:var(--ink);color:#fff}
+.state.warn,.state.error{border-color:var(--red);color:var(--red);background:#fff}
+.note-over{margin:14px 0 0;padding:12px 14px;border:1px solid var(--red);border-radius:4px;font-size:14px}
+.note-over[hidden]{display:none}
+
+figure{margin:24px 0 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:12px 0}
+figure svg{display:block;width:100%;height:auto}
+figure.dim svg{opacity:.35}
+
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;border-bottom:1px solid var(--line)}
+.nums div{padding:16px 0}
+.nums div+div{padding-left:16px;border-left:1px solid var(--line)}
+.nums dt{font-size:13px;color:var(--g3)}
+.nums dd{margin:4px 0 0;font-family:var(--en);font-size:19px;white-space:nowrap}
+.nums dd small{font-family:var(--kr);font-size:13px;color:var(--g3);margin-left:3px}
+
+.cond{display:grid;grid-template-columns:auto 1fr;gap:6px 20px;margin:16px 0 0;font-size:14px}
+.cond dt{color:var(--g3)}
+.cond dd{margin:0}
+
+.assume{margin-top:20px;padding:14px 16px;background:var(--soft);border-radius:4px;font-size:13px;color:var(--g3)}
+.assume b{color:var(--ink);font-weight:500}
+.assume ul{margin:6px 0 0;padding-left:18px}
+.assume li{margin:2px 0}
+.assume code{font-family:inherit;color:var(--ink)}
+
+footer{border-top:1px solid var(--ink);padding:24px 0 40px;font-size:13px;color:var(--g3)}
+footer p{margin:0 0 14px;max-width:820px}
+footer .sig{font-family:var(--en);font-size:9px;letter-spacing:.3em}
+
+@media (max-width:860px){
+  .wrap{padding:0 16px}
+  .grid{grid-template-columns:1fr;gap:40px}
+  .head{padding:28px 0 20px}
+  h1{font-size:24px}
+  .bore{font-size:54px}
+  .bore.warn{font-size:32px}
+  .product{display:none}
+}
+@media (max-width:420px){
+  .nums{grid-template-columns:1fr}
+  .nums div+div{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .nums div{padding:12px 0}
+}
+@media print{
+  @page{margin:12mm}
+  .actions,details.help,.hint{display:none}
+  .grid{grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:32px}
+  .head{padding:16px 0 12px}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  figure,.nums{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="MAM TOOLS">
+      <svg viewBox="0 0 204 40" aria-hidden="true">
+        <polygon points="0,40 0,0 6,0 28,24 50,0 56,0 56,40 50,40 50,11 28,35 6,11 6,40" fill="#0B0B0C"/>
+        <polygon points="74,40 98,0 106,0 130,40 122,40 102,8 82,40" fill="#E3262F"/>
+        <polygon points="148,40 148,0 154,0 176,24 198,0 204,0 204,40 198,40 198,11 176,35 154,11 154,40" fill="#0B0B0C"/>
+      </svg>
+      <span>TOOLS</span>
+    </a>
+    <div class="product">Cylinder Selector</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="head">
+    <h1>실린더 간편 선정기</h1>
+    <p>하중과 사용 압력으로 공압 실린더 내경을 빠르게 가늠합니다.</p>
+  </div>
+
+  <div class="grid">
+    <!-- 입력 -->
+    <section class="inputs" aria-labelledby="in-h">
+      <div class="dimhead"><b id="in-h">INPUT</b><i></i></div>
+      <form id="f" novalidate>
+        <div class="field" id="fld-mass">
+          <label for="mass">이동 하중</label>
+          <div class="box"><input id="mass" name="mass" type="text" inputmode="decimal" autocomplete="off" placeholder="예: 20" aria-describedby="msg-mass"><span class="unit">kg</span></div>
+          <div class="msg" id="msg-mass" role="alert"></div>
+          <div class="hint">실린더가 움직이는 물체의 질량</div>
+        </div>
+
+        <div class="field" id="fld-pressure">
+          <label for="pressure">사용 압력</label>
+          <div class="box"><input id="pressure" name="pressure" type="text" inputmode="decimal" autocomplete="off" value="0.5" aria-describedby="msg-pressure"><span class="unit">MPa</span></div>
+          <div class="msg" id="msg-pressure" role="alert"></div>
+          <div class="hint">실린더 공급 측 압력</div>
+        </div>
+
+        <div class="field">
+          <span class="lbl" id="ori-l">설치 방향</span>
+          <div class="seg" role="radiogroup" aria-labelledby="ori-l">
+            <input type="radio" name="orientation" id="ori-h" value="horizontal" checked>
+            <label for="ori-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 12h17M15 7l5 5-5 5"/></svg>수평</label>
+            <input type="radio" name="orientation" id="ori-v" value="vertical">
+            <label for="ori-v"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 21V4M7 9l5-5 5 5"/></svg>수직 상승</label>
+          </div>
+          <div class="hint" id="ori-hint">수평으로 미는 경우</div>
+        </div>
+
+        <div class="field" id="fld-mu">
+          <label for="mu">수평 저항계수 μ</label>
+          <div class="box"><input id="mu" name="mu" type="text" inputmode="decimal" autocomplete="off" value="0.2" aria-describedby="msg-mu mu-hint"></div>
+          <div class="msg" id="msg-mu" role="alert"></div>
+          <div class="hint" id="mu-hint">기본값 0.2 (참고값)</div>
+          <details class="help">
+            <summary>저항계수란?</summary>
+            <p>수평 이동 시 마찰·가이드 저항을 하중(무게)에 대한 비율로 단순 추정한 값입니다. 실제 값은 가이드 종류, 윤활, 정렬 상태 등 장치의 마찰 조건에 따라 달라지므로 장비에 맞게 수정하세요.</p>
+          </details>
+        </div>
+
+        <div class="field" id="fld-safety">
+          <label for="safety">안전율</label>
+          <div class="box"><input id="safety" name="safety" type="text" inputmode="decimal" autocomplete="off" value="2.0" aria-describedby="msg-safety"><span class="unit">배</span></div>
+          <div class="msg" id="msg-safety" role="alert"></div>
+          <div class="hint">필요 추력에 곱하는 계수 (기본 2.0)</div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">선정하기</button>
+          <button type="button" class="btn-line" id="save">결과 저장</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 결과 -->
+    <section class="result" id="result" aria-labelledby="out-h" tabindex="-1">
+      <div class="dimhead"><b id="out-h">RESULT</b><i></i></div>
+
+      <div class="answer">
+        <div>
+          <div class="k">추천 실린더 내경</div>
+          <div class="bore" id="bore">Ø —</div>
+          <div class="dreq" id="dreq">하중을 입력하세요.</div>
+        </div>
+        <div class="state error" id="state" aria-live="polite">입력 대기</div>
+      </div>
+      <p class="note-over" id="over" hidden>계산된 필요 내경이 표준 내경 범위(Ø6–Ø100)를 넘습니다. 더 큰 실린더, 복수 실린더 또는 다른 구동 방식을 검토하세요.</p>
+
+      <figure id="fig" class="dim" aria-label="계산 조건 그림"></figure>
+
+      <dl class="nums">
+        <div><dt>필요 추력</dt><dd id="o-freq">—</dd></div>
+        <div><dt>추천 내경의 전진 추력</dt><dd id="o-favl">—</dd></div>
+        <div><dt>추력 여유율</dt><dd id="o-margin">—</dd></div>
+      </dl>
+
+      <dl class="cond" id="cond"></dl>
+
+      <div class="assume">
+        <b>계산 가정</b>
+        <ul>
+          <li>유효 추력 보정계수 <code>η = 0.85</code> — 간편 계산용 가정값이며 제조사 보증값이 아닙니다.</li>
+          <li id="as-mode">수평: <code>F = m·g·μ·S</code> — 수평 저항계수(기본값 0.2, 참고값)로 단순 추정하며 가속도·외력은 반영하지 않습니다.</li>
+          <li>내경: <code>D = √(4F / (π·P·η))</code>, 표준 내경 Ø6·8·10·12·16·20·25·32·40·50·63·80·100 중 올림 선정.</li>
+          <li>전진 추력만 계산합니다. 후진 추력은 로드 직경이 정해져야 계산할 수 있습니다.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p id="disclaimer">본 계산기는 초기 실린더 내경 선정을 위한 참고용 간편 계산기입니다. 수평 이동은 입력한 저항계수를 이용한 단순 추정이며, 가속도·외력·실제 마찰·가이드 조건 등을 모두 반영하지 않습니다. 실제 설계 시에는 제조사 카탈로그와 장비 조건을 바탕으로 추력, 속도, 쿠션, 로드 좌굴, 설치 방식 및 안전 요건을 별도로 검토해야 합니다.</p>
+    <p>입력값은 이 브라우저 안에서만 계산되며 어디에도 전송되지 않습니다.</p>
+    <div class="sig">MAM TOOLS · 맘에 드는 설계 도구</div>
+  </div>
+</footer>
+
+<script src="calc.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.CylCalc;
+  var INK = '#0B0B0C', G1 = '#C4C6CA', G2 = '#8A8D93', G3 = '#5E6166', SOFT = '#F4F5F6', RED = '#E3262F';
+  var EN = "Michroma, 'Noto Sans KR', sans-serif", KR = "'Noto Sans KR', 'Malgun Gothic', sans-serif";
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $('f');
+  var last = null;
+
+  /* ── 숫자 표시 ── */
+  function fN(v) { // 추력 N
+    if (v >= 100) return Math.round(v).toLocaleString('en-US');
+    return v.toFixed(1);
+  }
+  function fNum(v, d) { // 입력값 표시: 불필요한 0 제거
+    return Number(v.toFixed(d)).toLocaleString('en-US', { maximumFractionDigits: d });
+  }
+
+  /* ── 그림: 도형(SVG) + 글자(목록) 분리 → 화면은 SVG, 저장은 캔버스 글자 ── */
+  function ln(x1, y1, x2, y2, c, w, dash) {
+    return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + c + '" stroke-width="' + (w || 1) + '"' + (dash ? ' stroke-dasharray="' + dash + '"' : '') + '/>';
+  }
+  function rc(x, y, w, h, fill, stroke, sw) {
+    return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (sw || 1.5) + '"/>';
+  }
+  function head(x, y, ang, c, s) { // 화살촉, ang = 진행 방향(rad)
+    s = s || 9;
+    var a1 = ang + Math.PI - 0.42, a2 = ang + Math.PI + 0.42;
+    return '<polygon points="' + x + ',' + y + ' ' + (x + s * Math.cos(a1)).toFixed(2) + ',' + (y + s * Math.sin(a1)).toFixed(2) + ' ' + (x + s * Math.cos(a2)).toFixed(2) + ',' + (y + s * Math.sin(a2)).toFixed(2) + '" fill="' + c + '"/>';
+  }
+  function arrow(x1, y1, x2, y2, c, w, dash, both) {
+    var a = Math.atan2(y2 - y1, x2 - x1), s = w > 1.5 ? 12 : 8;
+    var bx = x2 - Math.cos(a) * s * 0.8, by = y2 - Math.sin(a) * s * 0.8;
+    var sx = both ? x1 + Math.cos(a) * s * 0.8 : x1, sy = both ? y1 + Math.sin(a) * s * 0.8 : y1;
+    return ln(sx, sy, bx, by, c, w, dash) + head(x2, y2, a, c, s) + (both ? head(x1, y1, a + Math.PI, c, s) : '');
+  }
+  function hatch(x1, x2, y) {
+    var s = ln(x1, y, x2, y, INK, 1.5);
+    for (var x = x1 + 8; x <= x2; x += 11) s += ln(x, y, x - 8, y + 10, G2, 1);
+    return s;
+  }
+  function T(x, y, t, o) { o = o || {}; return { x: x, y: y, t: t, size: o.size || 13, fill: o.fill || INK, anchor: o.anchor || 'middle', font: o.font || 'kr', weight: o.weight || 400 }; }
+
+  function figure(v) {
+    var S = '', L = [];
+    var b = v.scaleBore;
+    var k = (Math.min(Math.max(b, 6), 100) - 6) / 94;   // 0~1, 내경에 따라 몸통 굵기
+    var boreTxt = v.boreLabel, massTxt = v.massLabel;
+
+    if (v.orientation === 'horizontal') {
+      var gy = 232, h = Math.round(40 + k * 32), cy = gy - 64;
+      var top = cy - h / 2, bot = cy + h / 2;
+      S += hatch(20, 580, gy);
+      // 받침
+      S += rc(70, bot, 12, gy - bot, '#fff', INK) + rc(228, bot, 12, gy - bot, '#fff', INK);
+      // 실린더
+      S += rc(68, top, 176, h, '#fff', INK, 2);
+      S += rc(52, top - 5, 16, h + 10, SOFT, INK, 2) + rc(244, top - 5, 16, h + 10, SOFT, INK, 2);
+      S += rc(56, top - 12, 8, 7, INK, INK, 1) + rc(248, top - 12, 8, 7, INK, INK, 1); // 포트
+      // 로드
+      var rt = Math.max(8, Math.round(h * 0.3));
+      S += rc(260, cy - rt / 2, 122, rt, SOFT, INK, 1.5);
+      // 하중
+      S += rc(382, gy - 104, 150, 104, SOFT, INK, 2);
+      L.push(T(457, gy - 64, '하중', { size: 13, fill: G3 }));
+      L.push(T(457, gy - 38, massTxt, { size: 18, font: 'en' }));
+      // 로드가 미는 방향
+      var py = top - 26;
+      S += arrow(272, py, 366, py, INK, 2);
+      L.push(T(319, py - 10, '로드 전진', { size: 12, fill: G3 }));
+      // 이동 방향
+      var my = gy - 130;
+      S += arrow(408, my, 506, my, INK, 2);
+      L.push(T(457, my - 10, '이동 방향', { size: 12, fill: G3 }));
+      // 저항
+      S += arrow(506, gy + 26, 408, gy + 26, G2, 1.2);
+      L.push(T(457, gy + 50, v.muLabel, { size: 12, fill: G3 }));
+      // 내경 치수
+      S += arrow(110, top + 2, 110, bot - 2, G2, 1, null, true);
+      L.push(T(122, cy + 7, boreTxt, { size: 17, font: 'en', anchor: 'start' }));
+    } else {
+      var gy2 = 272, cx = 300, w = Math.round(40 + k * 32);
+      var bt = 150, bb = gy2 - 16, l = cx - w / 2, r = cx + w / 2;
+      S += hatch(150, 450, gy2);
+      // 바닥 플랜지
+      S += rc(cx - w / 2 - 22, bb, w + 44, 16, SOFT, INK, 2);
+      // 실린더
+      S += rc(l, bt, w, bb - bt, '#fff', INK, 2);
+      S += rc(l - 5, bt - 14, w + 10, 14, SOFT, INK, 2);
+      S += rc(r + 5, bb - 26, 7, 8, INK, INK, 1) + rc(r + 5, bt - 10, 7, 8, INK, INK, 1); // 포트
+      // 로드
+      var rt2 = Math.max(8, Math.round(w * 0.3));
+      S += rc(cx - rt2 / 2, 82, rt2, bt - 14 - 82, SOFT, INK, 1.5);
+      // 하중
+      S += rc(cx - 80, 22, 160, 60, SOFT, INK, 2);
+      L.push(T(cx, 44, '하중', { size: 12, fill: G3 }));
+      L.push(T(cx, 70, massTxt, { size: 17, font: 'en' }));
+      // 상승
+      S += arrow(cx + 140, 150, cx + 140, 30, INK, 2);
+      L.push(T(cx + 152, 95, '상승', { size: 13, anchor: 'start', weight: 500 }));
+      // 중력
+      S += arrow(cx - 140, 30, cx - 140, 150, G2, 1.5, '5 4');
+      L.push(T(cx - 152, 88, '중력', { size: 13, anchor: 'end', fill: G3 }));
+      L.push(T(cx - 152, 106, 'm·g', { size: 12, anchor: 'end', fill: G3, font: 'en' }));
+      // 내경 치수
+      var dy = Math.round((bt + bb) / 2);
+      S += arrow(l + 2, dy, r - 2, dy, G2, 1, null, true);
+      L.push(T(r + 16, dy + 7, boreTxt, { size: 17, font: 'en', anchor: 'start' }));
+    }
+    return { shapes: S, labels: L, w: 600, h: 300 };
+  }
+  function fontOf(l) { return l.font === 'en' ? EN : KR; }
+  function figSVG(fg, title) {
+    var t = fg.labels.map(function (l) {
+      return '<text x="' + l.x + '" y="' + l.y + '" font-family="' + fontOf(l).replace(/"/g, "'") + '" font-size="' + l.size + '" font-weight="' + l.weight + '" fill="' + l.fill + '" text-anchor="' + l.anchor + '">' + esc(l.t) + '</text>';
+    }).join('');
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + fg.w + ' ' + fg.h + '" role="img" aria-label="' + esc(title) + '">' + fg.shapes + t + '</svg>';
+  }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  /* ── 입력 읽기 / 계산 / 표시 ── */
+  function read() {
+    return {
+      mass: $('mass').value, pressure: $('pressure').value, safety: $('safety').value, mu: $('mu').value,
+      orientation: form.orientation.value
+    };
+  }
+  var touched = {};
+  function render() {
+    var inp = read();
+    var r = C.compute(inp);
+    last = r;
+    var hor = r.orientation === 'horizontal';
+
+    $('fld-mu').hidden = !hor;
+    $('ori-hint').textContent = hor ? '수평으로 미는 경우' : '물체를 위로 들어 올리는 경우만 계산';
+
+    // 입력 오류 표시(아직 손대지 않은 빈 하중칸은 조용히)
+    ['mass', 'pressure', 'safety', 'mu'].forEach(function (k) {
+      var e = r.errors[k] || '';
+      if (k === 'mass' && !touched.mass && String(inp.mass).trim() === '') e = '';
+      $('msg-' + k).textContent = e;
+      $('fld-' + k).classList.toggle('bad', !!e);
+      $(k).setAttribute('aria-invalid', e ? 'true' : 'false');
+    });
+
+    var st = $('state'), bore = $('bore'), dreq = $('dreq');
+    st.className = 'state ' + r.status;
+    bore.className = 'bore';
+    $('over').hidden = r.status !== 'over';
+
+    var massOK = !r.errors.mass;
+    var massVal = massOK ? C.parsePositive(inp.mass).value : null;
+    var muVal = C.parsePositive(inp.mu);
+    var fgv = {
+      orientation: r.orientation,
+      scaleBore: r.status === 'ok' ? r.bore : (r.status === 'over' ? 100 : 32),
+      boreLabel: r.status === 'ok' ? 'Ø' + r.bore : (r.status === 'over' ? '>Ø100' : 'Ø —'),
+      massLabel: massVal !== null ? fNum(massVal, 2) + ' kg' : '— kg',
+      muLabel: '저항  μ = ' + (muVal.value !== undefined ? fNum(muVal.value, 3) : '—')
+    };
+
+    if (r.status === 'error') {
+      bore.textContent = 'Ø —';
+      var empty = String(inp.mass).trim() === '' && Object.keys(r.errors).length === 1;
+      st.textContent = empty ? '입력 대기' : '입력 확인 필요';
+      dreq.textContent = empty ? '이동 하중을 입력하세요.' : '빨간 칸의 값을 확인하세요. 계산을 멈췄습니다.';
+      $('o-freq').innerHTML = $('o-favl').innerHTML = $('o-margin').innerHTML = '—';
+    } else {
+      $('o-freq').innerHTML = fN(r.F_required) + '<small>N</small>';
+      if (r.status === 'ok') {
+        bore.textContent = 'Ø' + r.bore;
+        st.textContent = '표준 내경으로 선정됨';
+        dreq.textContent = '계산상 필요 내경 Ø' + r.D_required.toFixed(1) + ' mm → 표준 내경 올림';
+        $('o-favl').innerHTML = fN(r.F_available) + '<small>N</small>';
+        $('o-margin').innerHTML = r.margin.toFixed(1) + '<small>%</small>';
+      } else {
+        bore.textContent = '표준 내경 범위 초과';
+        bore.className = 'bore warn';
+        st.textContent = '범위 초과';
+        dreq.textContent = '계산상 필요 내경 Ø' + r.D_required.toFixed(1) + ' mm (표준 최대 Ø100)';
+        $('o-favl').innerHTML = $('o-margin').innerHTML = '—';
+      }
+    }
+
+    var fg = $('fig');
+    fg.classList.toggle('dim', r.status === 'error');
+    var fgd = figure(fgv);
+    if (fg.clientWidth && fg.clientWidth < 480) fgd.labels.forEach(function (l) { l.size = Math.round(l.size * 1.4); }); // 좁은 화면: 그림 글자 키움
+    fg.innerHTML = figSVG(fgd, (hor ? '수평 이동' : '수직 상승') + ' 조건 그림');
+
+    // 적용 조건
+    var rows = condRows(r, inp);
+    $('cond').innerHTML = rows.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('');
+    $('as-mode').innerHTML = hor
+      ? '수평: <code>F = m·g·μ·S</code> — 수평 저항계수(기본값 0.2, 참고값)로 단순 추정하며 가속도·외력·실제 마찰·가이드 조건은 반영하지 않습니다.'
+      : '수직 상승: <code>F = m·g·S</code> (g = 9.80665 m/s²) — 들어 올리는 경우만 계산하며 하강·정지·제동은 검토하지 않습니다.';
+
+    $('save').disabled = r.status === 'error';
+    last.fgv = fgv; last.rows = rows;
+  }
+  function condRows(r, inp) {
+    function v(k, d, unit) { var p = C.parsePositive(inp[k]); return p.value !== undefined ? fNum(p.value, d) + unit : '—'; }
+    var rows = [
+      ['설치 방향', r.orientation === 'horizontal' ? '수평 이동' : '수직 상승'],
+      ['이동 하중', v('mass', 3, ' kg')],
+      ['사용 압력', v('pressure', 3, ' MPa')],
+      ['안전율', v('safety', 2, '')],
+      ['수평 저항계수 μ', r.orientation === 'horizontal' ? v('mu', 3, '') : '해당 없음 (수직 상승)'],
+      ['보정계수 η', '0.85 (가정값)']
+    ];
+    return rows;
+  }
+
+  /* ── 결과 이미지 저장(PNG) ── */
+  function loadImg(src) {
+    return new Promise(function (ok, no) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = no; i.src = src; });
+  }
+  function wrap(ctx, text, maxW) {
+    var out = [], line = '', words = text.split(' ');
+    for (var i = 0; i < words.length; i++) {
+      var t = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(t).width > maxW && line) { out.push(line); line = words[i]; }
+      else line = t;
+    }
+    if (line) out.push(line);
+    return out;
+  }
+  function drawLogo(ctx, x, y, hgt) {
+    var s = hgt / 40;
+    var P = [
+      ['0,40 0,0 6,0 28,24 50,0 56,0 56,40 50,40 50,11 28,35 6,11 6,40', INK, 0],
+      ['74,40 98,0 106,0 130,40 122,40 102,8 82,40', RED, 0],
+      ['0,40 0,0 6,0 28,24 50,0 56,0 56,40 50,40 50,11 28,35 6,11 6,40', INK, 148]
+    ];
+    P.forEach(function (p) {
+      var pts = p[0].split(' ').map(function (q) { return q.split(',').map(Number); });
+      ctx.beginPath();
+      pts.forEach(function (q, i) { var px = x + (q[0] + p[2]) * s, py = y + q[1] * s; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+      ctx.closePath(); ctx.fillStyle = p[1]; ctx.fill();
+    });
+    return 204 * s;
+  }
+
+  async function saveImage() {
+    var r = last;
+    if (!r || r.status === 'error') return;
+    var btn = $('save'); btn.disabled = true; var oldTxt = btn.textContent; btn.textContent = '만드는 중…';
+    try {
+      var fg = figure(r.fgv);
+      var disclaimer = $('disclaimer').textContent;
+      var assume = [
+        '유효 추력 보정계수 η = 0.85 (간편 계산용 가정값, 제조사 보증값 아님)',
+        r.orientation === 'horizontal'
+          ? '수평: F = m·g·μ·S — 저항계수(기본값 0.2, 참고값)로 단순 추정, 가속도·외력 미반영'
+          : '수직 상승: F = m·g·S — 들어 올리는 경우만, 하강·정지·제동 미검토',
+        '내경 D = √(4F / (π·P·η)), 표준 내경 Ø6~Ø100 중 올림 선정 · 전진 추력만 계산'
+      ];
+      // 캔버스에서 쓸 글꼴 미리 불러오기
+      var allTxt = disclaimer + assume.join('') + r.rows.map(function (x) { return x.join(''); }).join('') + fg.labels.map(function (l) { return l.t; }).join('') + '실린더 간편 선정 결과추천 실린더 내경필요 추력전진 추력여유율표준 내경으로 선정됨범위 초과계산 가정입력 조건계산상 필요 내경';
+      if (document.fonts && document.fonts.load) {
+        try {
+          await Promise.all([
+            document.fonts.load('16px Michroma', 'Ø0123456789 kg.%>CYLINDERSELECTORTOOLSm·g'),
+            document.fonts.load('400 16px "Noto Sans KR"', allTxt),
+            document.fonts.load('700 16px "Noto Sans KR"', allTxt),
+            document.fonts.load('500 16px "Noto Sans KR"', allTxt)
+          ]);
+        } catch (e) { /* 오프라인이면 대체 글꼴 */ }
+      }
+      var svgTxt = '<svg xmlns="http://www.w3.org/2000/svg" width="' + fg.w + '" height="' + fg.h + '" viewBox="0 0 ' + fg.w + ' ' + fg.h + '">' + fg.shapes + '</svg>';
+      var img = await loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgTxt));
+
+      var W = 1080, PAD = 64, SC = 2;
+      var meas = document.createElement('canvas').getContext('2d');
+      meas.font = '400 15px ' + KR;
+      var discLines = wrap(meas, disclaimer, W - PAD * 2);
+      var H = 1000 + discLines.length * 23;
+
+      var cv = document.createElement('canvas');
+      cv.width = W * SC; cv.height = H * SC;
+      var c = cv.getContext('2d');
+      c.scale(SC, SC);
+      c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+      c.textBaseline = 'alphabetic';
+      function txt(t, x, y, font, color, align) { c.font = font; c.fillStyle = color || INK; c.textAlign = align || 'left'; c.fillText(t, x, y); }
+      function hl(y, color, w) { c.fillStyle = color; c.fillRect(PAD, y, W - PAD * 2, w || 1); }
+
+      // 머리
+      var lw = drawLogo(c, PAD, 52, 26);
+      txt('TOOLS', PAD + lw + 12, 78, '11px ' + EN, G3);
+      txt('CYLINDER SELECTOR', W - PAD, 76, '11px ' + EN, G3, 'right');
+      hl(104, INK, 1.5);
+
+      // 제목
+      txt('실린더 간편 선정 결과', PAD, 156, '700 30px ' + KR);
+      var d = new Date(), ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      txt(ds, W - PAD, 156, '400 14px ' + KR, G3, 'right');
+
+      // 추천 내경 + 그림
+      var y0 = 206;
+      txt('추천 실린더 내경', PAD, y0 + 20, '500 16px ' + KR, G3);
+      if (r.status === 'ok') {
+        txt('Ø' + r.bore, PAD, y0 + 112, '84px ' + EN, INK);
+      } else {
+        txt('표준 내경', PAD, y0 + 70, '700 38px ' + KR, RED);
+        txt('범위 초과', PAD, y0 + 116, '700 38px ' + KR, RED);
+      }
+      txt('계산상 필요 내경 Ø' + r.D_required.toFixed(1) + ' mm', PAD, y0 + 156, '400 15px ' + KR, G3);
+      // 상태 표시
+      var stTxt = r.status === 'ok' ? '표준 내경으로 선정됨' : '범위 초과 — 더 큰 실린더·복수 실린더·다른 구동 방식 검토';
+      c.font = '500 14px ' + KR;
+      var sw = c.measureText(stTxt).width + 28;
+      if (r.status === 'ok') { c.fillStyle = INK; roundRect(c, PAD, y0 + 178, sw, 32, 16); c.fill(); txt(stTxt, PAD + 14, y0 + 199, '500 14px ' + KR, '#fff'); }
+      else {
+        var lines = wrap(c, '더 큰 실린더, 복수 실린더 또는 다른 구동 방식을 검토하세요.', 330);
+        lines.forEach(function (ln2, i) { txt(ln2, PAD, y0 + 198 + i * 22, '500 14px ' + KR, RED); });
+      }
+      // 그림(도형 + 글자)
+      var fx = 440, fy = y0 - 6, fs = (W - PAD - fx) / fg.w;
+      c.drawImage(img, fx, fy, fg.w * fs, fg.h * fs);
+      fg.labels.forEach(function (l) {
+        c.save(); c.translate(fx, fy); c.scale(fs, fs);
+        txt(l.t, l.x, l.y, l.weight + ' ' + l.size + 'px ' + fontOf(l), l.fill, l.anchor === 'middle' ? 'center' : (l.anchor === 'end' ? 'right' : 'left'));
+        c.restore();
+      });
+
+      // 숫자 3칸
+      var y1 = y0 + fg.h * fs + 20;
+      hl(y1, '#E3E4E6');
+      var cw = (W - PAD * 2) / 3;
+      var nums = [
+        ['필요 추력', fN(r.F_required), 'N'],
+        ['추천 내경의 전진 추력', r.status === 'ok' ? fN(r.F_available) : '—', r.status === 'ok' ? 'N' : ''],
+        ['추력 여유율', r.status === 'ok' ? r.margin.toFixed(1) : '—', r.status === 'ok' ? '%' : '']
+      ];
+      nums.forEach(function (n, i) {
+        var x = PAD + cw * i + (i ? 20 : 0);
+        if (i) { c.fillStyle = '#E3E4E6'; c.fillRect(PAD + cw * i, y1 + 16, 1, 64); }
+        txt(n[0], x, y1 + 38, '400 14px ' + KR, G3);
+        txt(n[1], x, y1 + 72, '24px ' + EN, INK);
+        c.font = '24px ' + EN; var nw = c.measureText(n[1]).width;
+        txt(n[2], x + nw + 6, y1 + 72, '400 15px ' + KR, G3);
+      });
+      hl(y1 + 96, '#E3E4E6');
+
+      // 입력 조건 / 계산 가정
+      var y2 = y1 + 140;
+      txt('입력 조건', PAD, y2, '700 16px ' + KR);
+      r.rows.forEach(function (row, i) {
+        var yy = y2 + 32 + i * 26;
+        txt(row[0], PAD, yy, '400 14px ' + KR, G3);
+        txt(row[1], PAD + 140, yy, '400 14px ' + KR, INK);
+      });
+      var ax = PAD + 420;
+      txt('계산 가정', ax, y2, '700 16px ' + KR);
+      var ay = y2 + 32;
+      c.font = '400 14px ' + KR;
+      assume.forEach(function (a) {
+        wrap(c, a, W - PAD - ax).forEach(function (ln3, j) { txt((j ? '   ' : '·  ') + ln3, ax, ay, '400 14px ' + KR, INK); ay += 22; });
+        ay += 6;
+      });
+
+      // 고지
+      var y3 = Math.max(y2 + 32 + r.rows.length * 26, ay) + 24;
+      hl(y3, INK, 1);
+      discLines.forEach(function (ln4, i) { txt(ln4, PAD, y3 + 34 + i * 23, '400 15px ' + KR, G3); });
+      var y4 = y3 + 34 + discLines.length * 23 + 16;
+      txt('MAM TOOLS · 맘에 드는 설계 도구', PAD, y4, '10px ' + EN, G3);
+
+      // 실제 쓴 높이로 잘라내기
+      var finalH = Math.ceil(y4 + 40);
+      var out = document.createElement('canvas');
+      out.width = W * SC; out.height = finalH * SC;
+      out.getContext('2d').drawImage(cv, 0, 0);
+
+      var name = 'MAMTOOLS_cylinder_' + (r.status === 'ok' ? 'D' + r.bore : 'over') + '_' + ds.replace(/-/g, '') + '.png';
+      await new Promise(function (ok) {
+        out.toBlob(function (blob) {
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url; a.download = name;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+          ok();
+        }, 'image/png');
+      });
+    } catch (e) {
+      alert('이미지를 만들지 못했습니다. 브라우저 인쇄(Ctrl+P)로 저장해 주세요.');
+    } finally {
+      btn.textContent = oldTxt; btn.disabled = !last || last.status === 'error';
+    }
+  }
+  function roundRect(c, x, y, w, h, rr) {
+    c.beginPath(); c.moveTo(x + rr, y); c.arcTo(x + w, y, x + w, y + h, rr); c.arcTo(x + w, y + h, x, y + h, rr); c.arcTo(x, y + h, x, y, rr); c.arcTo(x, y, x + w, y, rr); c.closePath();
+  }
+
+  /* ── 이벤트 ── */
+  form.addEventListener('input', function (e) { if (e.target.id) touched[e.target.id] = true; render(); });
+  form.addEventListener('change', render);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    touched.mass = true;
+    render();
+    var res = $('result');
+    if (window.matchMedia('(max-width:860px)').matches) res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    res.focus({ preventScroll: true });
+  });
+  $('save').addEventListener('click', saveImage);
+  var rzT; window.addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(render, 120); });
+  render();
+
+  window.__cyl = { render: render, figure: figure, last: function () { return last; } }; // 시험용
+})();
+</script>
+</body>
+</html>
